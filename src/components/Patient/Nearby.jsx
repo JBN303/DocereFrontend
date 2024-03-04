@@ -1,34 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { TextField, Button, Typography, Box, Modal, Card, CardContent } from '@mui/material';
+import { Button, Typography, Box, Modal, Card, CardContent ,Paper, IconButton, InputBase } from '@mui/material';
 import CardMedia from '@mui/material/CardMedia';
-import { CardActionArea } from '@mui/material';
+import { CardActionArea, Select } from '@mui/material';
+import { TextField, MenuItem} from '@mui/material';
+import { useParams } from 'react-router-dom';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import DirectionsIcon from '@mui/icons-material/Directions';
+import Loading from '../Doctor/Loading';
+
+
 const Nearby = () => {
+  const { id } = useParams();
+  const [patientData, setPatientData] = useState(null);
   const [pincode, setPincode] = useState('');
   const [doctors, setDoctors] = useState([]);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [appointmentDetails, setAppointmentDetails] = useState({
+    appno:'',
     patientName: '',
     age: '',
-    contactNo: '',
-    email: '',
+    date: '', // New input for date
+    day: 'Any',
     purpose: '',
+    time:'',
+    msg:'',
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5007/api/doctors');
-        setDoctors(response.data);
+        // Fetch patient data
+        const patientResponse = await axios.get(`http://localhost:5007/api/user/${id}`);
+        setPatientData(patientResponse.data);
+
+        // Fetch list of doctors
+        const doctorsResponse = await axios.get('http://localhost:5007/api/doctors');
+        setDoctors(doctorsResponse.data);
       } catch (error) {
-        console.error('Error fetching doctors:', error);
+        console.error('Error fetching patient data or doctors:', error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleSearch = () => {
     const filtered = doctors.filter((doctor) => doctor.conslt === pincode);
@@ -55,22 +75,34 @@ const Nearby = () => {
   const handleBookAppointment = async (doctorId) => {
     try {
       const appointmentDetailsToSend = {
+        patientId: id,
+        doctorId,
+        appno: appointmentDetails.appno,
         patientName: appointmentDetails.patientName,
         age: appointmentDetails.age,
-        contactNo: appointmentDetails.contactNo,
-        email: appointmentDetails.email,
+        date: appointmentDetails.date,
+        day: appointmentDetails.day,
         purpose: appointmentDetails.purpose,
+        time: appointmentDetails.time,
+        msg: appointmentDetails.msg,
+        doctorName: selectedDoctor.name,
+        doctorLocation: selectedDoctor.locat,
+        patientEmail: patientData.Email, // Make sure patientData contains email
+        patientContactNo: patientData.Phone, // Make sure patientData contains phone number
       };
 
       const response = await axios.post(`http://localhost:5007/api/appointments/${doctorId}`, appointmentDetailsToSend);
 
       console.log('Appointment booked successfully:', response.data);
       setAppointmentDetails({
+        appno:'',
         patientName: '',
         age: '',
-        contactNo: '',
-        email: '',
+        date: '', //  New input for date
+        day: 'any',
         purpose: '',
+        time:'',
+        msg:'',
       });
       
       alert("Appointment successful");
@@ -83,20 +115,24 @@ const Nearby = () => {
 
   return (
     <div>
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-        <TextField
-          label="Search by Pincode"
-          variant="outlined"
+      <Paper
+        component="form"
+        sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, margin: 'auto' }}
+      >
+        <InputBase
+          sx={{ ml: 1, flex: 1 }}
+          placeholder="Search by Pincode"
+          inputProps={{ 'aria-label': 'search pincode' }}
           value={pincode}
           onChange={(e) => setPincode(e.target.value)}
         />
-        <Button variant="contained" onClick={handleSearch} style={{ marginLeft: '10px' }}>
-          Search
-        </Button>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch}>
+          <SearchIcon />
+        </IconButton>
+      </Paper>
+      {/* <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
         <Typography variant="h5">Nearby Doctors</Typography>
-      </Box>
+      </Box> */}
       <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
         {filteredDoctors.map((doctor) => (
          <Card key={doctor._id} sx={{ maxWidth: 345, margin: 2 }}>
@@ -168,24 +204,33 @@ const Nearby = () => {
               value={appointmentDetails.age}
               onChange={handleInputChange}
             />
+            <Typography>date</Typography>
             <TextField
-              label="Contact No."
+              
+              type="date" // Input type for date
               variant="outlined"
               fullWidth
               margin="normal"
-              name="contactNo"
-              value={appointmentDetails.contactNo}
+              name="date"
+              value={appointmentDetails.date}
               onChange={handleInputChange}
             />
-            <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="email"
-              value={appointmentDetails.email}
+            <FormControl fullWidth variant="outlined" margin="normal">
+        <InputLabel htmlFor="time">Time</InputLabel>
+            <Select
+              id="time"
+              name="day"
+              value={appointmentDetails.day}
               onChange={handleInputChange}
-            />
+              style={{ width: '100%', marginBottom: '16px' }}
+            >
+              <MenuItem value="morning">Any</MenuItem>
+              <MenuItem value="morning">Morning</MenuItem>
+              <MenuItem  value="noon">Noon</MenuItem >
+              <MenuItem  value="evening">Evening</MenuItem >
+            </Select>
+            </FormControl>
+            
             <TextField
               label="Purpose of Appointment"
               variant="outlined"

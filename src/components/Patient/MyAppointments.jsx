@@ -6,6 +6,9 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import Loading from '../Doctor/Loading';
 
 const MyAppointments = () => {
   const { id } = useParams();
@@ -27,6 +30,17 @@ const MyAppointments = () => {
     fetchAppointments();
   }, [id]);
 
+  //delete appoinments 
+  const handleDeleteAppointment = async (appointmentId) => {
+    try {
+      await axios.delete(`http://localhost:5007/api/appointments/${appointmentId}`);
+      // Filter out the deleted appointment from the appointments array
+      setAppointments(prevAppointments => prevAppointments.filter(appointment => appointment._id !== appointmentId));
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+    }
+  };
+
   return (
     <div style={{ background: 'white' }}>
       
@@ -44,13 +58,13 @@ const MyAppointments = () => {
                   {appointment.doctorName}
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                  appointment no: {appointment.appno}
+                  Appointment no: {appointment.appno}
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                appointment Date: {appointment.date}
+                Appointment Date: {appointment.date}
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                appointment time : {appointment.time}
+                Appointment time : {appointment.time}
                 </Typography>
                 <Typography variant="body2">
                    {appointment.msg}
@@ -58,8 +72,13 @@ const MyAppointments = () => {
               </CardContent>
               <CardActions>
                 <Button size="small" href={appointment.doctorLocation} target="_blank" rel="noopener noreferrer">
-                      Get Direction╰┈➤
+                ╰┈➤ Get Direction
                     </Button>
+                    <Typography>
+                    <IconButton onClick={() => handleDeleteAppointment(appointment._id)} aria-label="delete">
+      <DeleteIcon />
+    </IconButton>
+    </Typography>
               </CardActions>
             </Card>
           ))}

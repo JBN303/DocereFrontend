@@ -27,6 +27,7 @@ import SpecializationTabs from './Specialization';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import MyAppointments from './MyAppointments'
+import Loading from '../Doctor/Loading';
 
 const drawerWidth = 240;
 
@@ -35,6 +36,7 @@ const Psidebar = () => {
   const [patientData, setPatientData] = useState(null);
   const [doctors, setDoctors] = useState([]);
   const [selectedMenuItem, setSelectedMenuItem] = useState('All Doctors');
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -45,15 +47,22 @@ const Psidebar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch patient data
-        const patientResponse = await axios.get(`http://localhost:5007/api/patients/${id}`);
-        setPatientData(patientResponse.data);
+        const [patientResponse, doctorsResponse] = await Promise.all([
+          axios.get(`http://localhost:5007/api/user/${id}`),
+          axios.get('http://localhost:5007/api/doctors'),
+        ]);
 
-        // Fetch list of doctors
-        const doctorsResponse = await axios.get('http://localhost:5007/api/doctors');
-        setDoctors(doctorsResponse.data);
+        setTimeout(() => {
+          setPatientData(patientResponse.data);
+          setDoctors(doctorsResponse.data);
+  
+          // Set loading to false after fetching data
+          setIsLoading(false);
+        }, 3000);
       } catch (error) {
         console.error('Error fetching patient data or doctors:', error);
+        // Set loading to false in case of an error
+        setIsLoading(false);
       }
     };
 
@@ -63,6 +72,10 @@ const Psidebar = () => {
   const handleListItemClick = (text) => {
     setSelectedMenuItem(text);
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
   
 
   return (

@@ -23,6 +23,8 @@ import styled from '@emotion/styled';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import FolderIcon from '@mui/icons-material/Folder';
 import Avatar from '@mui/material/Avatar';
+import Autocomplete from '@mui/material/Autocomplete';
+import Checkbox from '@mui/material/Checkbox';
 
 const theme = createTheme({
   palette: {
@@ -53,7 +55,7 @@ function SignUp() {
     lang: '',
     locat: '',
     conslt: '',
-    type: 'online',
+    type: '',
     cert: '',
     pic: '',
     about: '',
@@ -63,6 +65,8 @@ function SignUp() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [previewPhoto, setPreviewPhoto] = useState(null); 
+  const [previewCert, setPreviewCert] = useState(null); 
   const navigate = useNavigate();
 
   const InputHandler = (event) => {
@@ -95,7 +99,29 @@ const SaveData = () => {
     })
     .catch(err => console.log(err));
 };
+const handleProfilePhotoChange = (event) => {
+  const file = event.target.files[0];
+  setInputs((inputs) => ({ ...inputs, pic: file }));
 
+  // Display the selected profile photo
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    setPreviewPhoto(e.target.result);
+  };
+  reader.readAsDataURL(file);
+};
+
+const handleCertificateChange = (event) => {
+  const file = event.target.files[0];
+  setInputs((inputs) => ({ ...inputs, cert: file }));
+
+  // Display the selected certificate
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    setPreviewCert(e.target.result);
+  };
+  reader.readAsDataURL(file);
+};
 
   return (
     <ThemeProvider theme={theme}>
@@ -184,6 +210,52 @@ const SaveData = () => {
                   margin="normal"
                 />
               </Grid>
+              {/* <Grid item xs={6}>
+  <Autocomplete
+    multiple
+    id="qualification"
+    options={['MBBS', 'MD', 'MS', 'Diploma', 'PhD', 'Other']}
+    defaultValue={[]}
+    isOptionEqualToValue={(option, value) => option === value}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        fullWidth
+        label="Qualification"
+        name="edu"
+        placeholder="Select Qualifications"
+        onChange={(event, value) => {
+          const selectedQualifications = value.join(',');
+          setInputs((inputs) => ({ ...inputs, edu: selectedQualifications }));
+        }}
+      />
+    )}
+  />
+</Grid>
+
+<Grid item xs={6}>
+  <Autocomplete
+    multiple
+    id="language"
+    options={['English', 'French', 'Hindi', 'Spanish', 'German']}
+    defaultValue={[]}
+    isOptionEqualToValue={(option, value) => option === value}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        fullWidth
+        label="Language"
+        name="lang"
+        placeholder="Select Languages"
+        onChange={(event, value) => {
+          const selectedLanguages = value.join(',');
+          setInputs((inputs) => ({ ...inputs, lang: selectedLanguages }));
+        }}
+      />
+    )}
+  />
+</Grid> */}
+
               <Grid item xs={6}>
                 <TextField
                   fullWidth
@@ -208,9 +280,10 @@ const SaveData = () => {
               </Grid>
               <Grid item xs={6}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Specilatation</InputLabel>
+                  <InputLabel>specialization</InputLabel>
                   <Select
                     name="spec"
+                    label="specialization"
                     value={inputs.spec}
                     onChange={InputHandler}
                   >
@@ -226,53 +299,61 @@ const SaveData = () => {
               </Grid>
               <Grid item xs={6}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Consultation Type</InputLabel>
+                  <InputLabel>Gender</InputLabel>
                   <Select
                     name="type"
+                    label="Gender"
                     value={inputs.type}
                     onChange={InputHandler}
                   >
-                    <MenuItem value="online">Online Consultation</MenuItem>
-                    <MenuItem value="inclinic">Inclinic Consultation</MenuItem>
-                    <MenuItem value="Both">Both</MenuItem>
+                    <MenuItem value="online">Male</MenuItem>
+                    <MenuItem value="inclinic">Female</MenuItem>
+                    <MenuItem value="Both">Others</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={6}>
-  
-              <TextField
+  <TextField
     fullWidth
     label="Profile Photo"
     name="pic"
     type="file"
-    onChange={(event) => setInputs((inputs) => ({...inputs, pic: event.target.files[0]}))}
+    onChange={handleProfilePhotoChange}
     margin="normal"
     InputProps={{
       startAdornment: (
         <InputAdornment position="start">
-          <Avatar>☺</Avatar>
+          {previewPhoto ? (
+            <Avatar alt="Profile Photo" src={previewPhoto} />
+          ) : (
+            <Avatar>☺</Avatar>
+          )}
         </InputAdornment>
       ),
     }}
   />
 </Grid>
 <Grid item xs={6}>
-  <TextField
-    fullWidth
-    label="Certificate"
-    name="cert"
-    type="file"
-    onChange={(event) => setInputs((inputs) => ({...inputs, cert: event.target.files[0]}))}
-    margin="normal"
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position="start">
-          <FolderIcon />
-        </InputAdornment>
-      ),
-    }}
-  />
-</Grid>
+    <TextField
+      fullWidth
+      label="Certificate"
+      name="cert"
+      type="file"
+      onChange={handleCertificateChange}
+      margin="normal"
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            {previewCert ? (
+              <Avatar alt="Certificate" src={previewCert} />
+            ) : (
+              <FolderIcon />
+            )}
+          </InputAdornment>
+        ),
+      }}
+    />
+  </Grid>
 
 
 

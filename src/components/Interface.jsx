@@ -32,7 +32,7 @@ function Interface() {
                 <div className="dropdown">
                   <button className="dropbtn dropbtn non-style-link nav-item" style={{ paddingRight: '10px' }} >REGISTER</button>
                   <div className="dropdown-content">
-                    <a href="patient register">PATIENT</a>
+                    <a href="patient register">USER</a>
                     <a href="register">DOCTOR</a>
                   </div>
                 </div>

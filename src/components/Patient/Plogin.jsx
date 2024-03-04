@@ -30,23 +30,23 @@ const CustomContainer = styled(Container)({
 });
 
 const Plogin = () => {
-  const [patientEmail, setPatientEmail] = useState('');
-  const [patientPassword, setPatientPassword] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!patientEmail || !patientPassword) {
+    if (!userEmail || !userPassword) {
       setError('Please enter both email and password.');
       return;
     }
 
     try {
       const response = await axios.post('http://localhost:5007/api/plogin', {
-        email: patientEmail,
-        password: patientPassword,
+        email: userEmail,
+        password: userPassword,
       });
 
       navigate(`/psidebar/${response.data._id}`);  // navigate to patient's user page with patient's _id
@@ -72,24 +72,24 @@ const Plogin = () => {
           <Typography variant="subtitle1">Login with your details to continue</Typography>
           <TextField
             type="email"
-            name="Patientemail"
+            name="Useremail"
             label="Email Address"
             variant="outlined"
             fullWidth
             margin="normal"
-            value={patientEmail}
-            onChange={(e) => setPatientEmail(e.target.value)}
+            value={userEmail}
+            onChange={(e) => setUserEmail(e.target.value)}
             required
           />
           <TextField
             type="password"
-            name="Patientpassword"
+            name="Userpassword"
             label="Password"
             variant="outlined"
             fullWidth
             margin="normal"
-            value={patientPassword}
-            onChange={(e) => setPatientPassword(e.target.value)}
+            value={userPassword}
+            onChange={(e) => setUserPassword(e.target.value)}
             required
           />
           {error && (

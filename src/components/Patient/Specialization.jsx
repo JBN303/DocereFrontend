@@ -11,6 +11,11 @@ import { TextField } from '@mui/material';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TabPanel from '@mui/material/Tabs';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import {MenuItem} from '@mui/material';
+import { Select } from '@mui/material';
+import Loading from '../Doctor/Loading';
 
 export default function SpecializationTabs() {
   const { id } = useParams();
@@ -20,11 +25,14 @@ export default function SpecializationTabs() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [appointmentDetails, setAppointmentDetails] = useState({
+    appno:'',
     patientName: '',
     age: '',
-    contactNo: '',
-    email: '',
+    date: '', // New input for date
+    day: 'Any',
     purpose: '',
+    time:'',
+    msg:'',
   });
   const [value, setValue] = React.useState(0);
 
@@ -32,7 +40,7 @@ export default function SpecializationTabs() {
     const fetchData = async () => {
       try {
         // Fetch patient data
-        const patientResponse = await axios.get(`http://localhost:5007/api/patients/${id}`);
+        const patientResponse = await axios.get(`http://localhost:5007/api/user/${id}`);
         setPatientData(patientResponse.data);
 
         // Fetch list of doctors
@@ -112,11 +120,20 @@ export default function SpecializationTabs() {
 
       // You can customize the appointment details based on your requirements
       const appointmentDetailsToSend = {
+        patientId: id,
+        doctorId,
+        appno: appointmentDetails.appno,
         patientName: appointmentDetails.patientName,
         age: appointmentDetails.age,
-        contactNo: appointmentDetails.contactNo,
-        email: appointmentDetails.email,
+        date: appointmentDetails.date,
+        day: appointmentDetails.day,
         purpose: appointmentDetails.purpose,
+        time: appointmentDetails.time,
+        msg: appointmentDetails.msg,
+        doctorName: selectedDoctor.name,
+        doctorLocation: selectedDoctor.locat,
+        patientEmail: patientData.Email, // Make sure patientData contains email
+        patientContactNo: patientData.Phone, // Make sure patientData contains phone number
       };
 
       // Send appointment details to the server
@@ -125,11 +142,14 @@ export default function SpecializationTabs() {
       // Log the response or handle it as needed
       console.log('Appointment booked successfully:', response.data);
       setAppointmentDetails({
+        appno:'',
         patientName: '',
         age: '',
-        contactNo: '',
-        email: '',
+        date: '', //  New input for date
+        day: 'any',
         purpose: '',
+        time:'',
+        msg:'',
       });
 
       alert("Appointment successful");
@@ -251,24 +271,33 @@ export default function SpecializationTabs() {
               value={appointmentDetails.age}
               onChange={handleInputChange}
             />
+            <Typography>date</Typography>
             <TextField
-              label="Contact No."
+              
+              type="date" // Input type for date
               variant="outlined"
               fullWidth
               margin="normal"
-              name="contactNo"
-              value={appointmentDetails.contactNo}
+              name="date"
+              value={appointmentDetails.date}
               onChange={handleInputChange}
             />
-            <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="email"
-              value={appointmentDetails.email}
+            <FormControl fullWidth variant="outlined" margin="normal">
+        <InputLabel htmlFor="time">Time</InputLabel>
+            <Select
+              id="time"
+              name="day"
+              value={appointmentDetails.day}
               onChange={handleInputChange}
-            />
+              style={{ width: '100%', marginBottom: '16px' }}
+            >
+              <MenuItem value="morning">Any</MenuItem>
+              <MenuItem value="morning">Morning</MenuItem>
+              <MenuItem  value="noon">Noon</MenuItem >
+              <MenuItem  value="evening">Evening</MenuItem >
+            </Select>
+            </FormControl>
+            
             <TextField
               label="Purpose of Appointment"
               variant="outlined"

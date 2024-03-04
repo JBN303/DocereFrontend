@@ -8,11 +8,12 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import { CardActionArea, Modal, Box, Select } from '@mui/material';
+import { CardActionArea, Modal, Box, Select, IconButton} from '@mui/material';
 import { TextField, MenuItem} from '@mui/material';
 import { Label } from '@mui/icons-material';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import Loading from '../Doctor/Loading';
 
 
 const PatientProfile = () => {
@@ -31,12 +32,14 @@ const PatientProfile = () => {
     time:'',
     msg:'',
   });
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [noDoctorsFound, setNoDoctorsFound] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch patient data
-        const patientResponse = await axios.get(`http://localhost:5007/api/patients/${id}`);
+        const patientResponse = await axios.get(`http://localhost:5007/api/user/${id}`);
         setPatientData(patientResponse.data);
 
         // Fetch list of doctors
@@ -121,57 +124,63 @@ const PatientProfile = () => {
       console.error('Error booking appointment:', error);
     }
   };
+
+  const handleSearch = (query) => {
+    const filtered = doctors.filter((doctor) =>
+      doctor.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredDoctors(filtered);
+    setNoDoctorsFound(filtered.length === 0);
+  };
   
   
 
   return (
     <div>
+            <TextField
+        label="Search Doctor"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        onChange={(e) => handleSearch(e.target.value)}
+      />
+      {noDoctorsFound && <Typography variant="h6">No doctors found.</Typography>}
       {patientData ? (
-        <div >
-          <Box
-            display="flex"
-            flexWrap="wrap"
-            justifyContent="space-between" 
-            sx={{
-              flexGrow: 1,
-              p: 3,
-              
-            }}
-          >
-            {doctors.map((doctor) => (
-                 <Card key={doctor._id} sx={{ display: 'flex' }}>
-                                   <CardMedia
-                    component="img"
-                 height="140"
-                 image={`data:image/jpeg;base64,${doctor.pic}`}
-                 alt="Profile"
-                 />
-                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                   <CardContent sx={{ flex: '1 0 auto' }}>
-                     <Typography component="div" variant="h5">
-                     {doctor.name}
-                     </Typography>
-                     <Typography variant="subtitle1" color="text.secondary" component="div">
-                     {doctor.age}
-                     </Typography>
-                     <Typography variant="subtitle1" color="text.secondary" component="div">
-                     {doctor.spec}
-                     </Typography>
-                     <Typography variant="subtitle1" color="text.secondary" component="div">
-                     {doctor.lang}
-                     </Typography>
-                     <Button onClick={() => handleOpenModal(doctor)} style={{ color: '#77d5cb' }}>
-        Book Appointment
-      </Button>
-                   </CardContent>
-
-                 </Box>
-
-               </Card>
-
-            ))}
-          </Box>
-        </div>
+   <div>
+   <Box sx={{ display: 'flex', marginTop: '20px', flexWrap: 'wrap' }}>
+     {(filteredDoctors.length ? filteredDoctors : doctors).map((doctor) => (
+       <Card key={doctor._id} sx={{ display: 'flex', margin: 2, width: 500 }}>
+                 <CardMedia
+           component="img"
+           sx={{ width: 181 }}
+           image={`data:image/jpeg;base64,${doctor.pic}`}
+           alt="Profile"
+         />
+         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+           <CardContent sx={{ flex: '1 0 auto' }}>
+             <Typography component="div" variant="h5">
+               {doctor.name}
+             </Typography>
+             <Typography variant="body1" color="text.secondary">
+               Age: {doctor.age}
+             </Typography>
+             <Typography variant="body1" color="text.secondary">
+               Specialty: {doctor.spec}
+             </Typography>
+             <Typography variant="body1" color="text.secondary">
+               Language: {doctor.lang}
+             </Typography>
+           </CardContent>
+           <Box sx={{ display: 'flex', alignItems: 'center', pl: 2, pb: 2 }}>
+             <Button onClick={() => handleOpenModal(doctor)} style={{ color: '#77d5cb' }}>
+               Book Appointment
+             </Button>
+           </Box>
+         </Box>
+       </Card>
+     ))}
+   </Box>
+ </div>
       ) : (
         <p>Loading...</p>
       )}

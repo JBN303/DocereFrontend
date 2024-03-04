@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
@@ -15,11 +16,23 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import LogoutIcon from '@mui/icons-material/Logout'; // Import LogoutIcon from Material-UI
+import Loading from '../Doctor/Loading';
 
 const drawerWidth = 240;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate a loading time of 3 seconds
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // 3000 milliseconds = 3 seconds
+
+    // Clean up the timeout to avoid memory leaks
+    return () => clearTimeout(timeout);
+  }, []);
 
   const navigateTo = (path) => {
     navigate(path);
@@ -32,6 +45,9 @@ export default function AdminDashboard() {
     // Redirect to login page
     navigate('/admin', { replace: true });
   };
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <Box>
@@ -58,7 +74,7 @@ export default function AdminDashboard() {
               {[
                 { text: 'Dashboard', icon: <InboxIcon /> },
                 { text: 'Doctors List', icon: <MailIcon />, link: '/doctorview' },
-                { text: 'Patient List', icon: <InboxIcon />, link: '/pview' },
+                { text: 'Users List', icon: <InboxIcon />, link: '/pview' },
                 // Add other menu items
               ].map(({ text, icon, link }, index) => (
                 <ListItem key={text} disablePadding button onClick={() => navigateTo(link)}>
@@ -85,7 +101,7 @@ export default function AdminDashboard() {
           </Box>
         </Drawer>
       </div>
-      <div sx={{ flexGrow: 7, p: 3 }}>
+      <div sx={{ flexGrow: 7, p: 3  }}>
         <Box component="main" sx={{ flexGrow: 7, p: 3 }}>
           {/* The content of the selected view will be rendered here */}
         </Box>

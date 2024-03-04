@@ -13,23 +13,23 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
-
+import Loading from '../Doctor/Loading';
 import AdminDashboard from './Interfac';
 
 const theme = createTheme();
 
 const PatientView = () => {
-  const [patients, setPatients] = useState([]);
+  const [user, setPatients] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5007/api/patients')
+    axios.get('http://localhost:5007/api/user')
       .then(response => setPatients(response.data))
       .catch(error => console.error(error));
   }, []);
 
   const toggleStatus = async (id) => {
     try {
-      await axios.put(`http://localhost:5007/api/patients/toggle/${id}`);
+      await axios.put(`http://localhost:5007/api/user/toggle/${id}`);
 
       // Update the local state instead of making a new API call
       setPatients(prevPatients => {
@@ -56,7 +56,7 @@ const PatientView = () => {
         <Toolbar>
         
           <Typography variant="h6" component="div">
-            Patients List
+            User List
           </Typography>
         </Toolbar>
       
@@ -79,7 +79,7 @@ const PatientView = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {patients.map(patient => (
+              {user.map(patient => (
                 <TableRow  key={patient._id}>
                   <TableCell>{patient.status === 'active' ? 'Active' : 'Inactive'}</TableCell>
                   <TableCell>{patient.Name}</TableCell>

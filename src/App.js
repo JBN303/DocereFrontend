@@ -19,6 +19,7 @@ import Nearby from "./components/Patient/Nearby";
 import EditProfile from "./components/Doctor/EditProfile";
 import MyAppointments from "./components/Patient/MyAppointments";
 import Loading from "./components/Doctor/Loading";
+import AdminDash from "./components/Admin/AdminDash";
 function App() {
   return (
     <div>
@@ -36,7 +37,7 @@ function App() {
       <Route path="/edit/:userId" element={<EditProfile/>} />
       <Route path="/doctor/:userId" element={<DoctorPage />} />
       <Route path='/admindashboard' element={<Interfac/>}></Route>
-     
+     <Route path="/dash" element={<AdminDash/>}></Route>
       <Route path='/pview' element={<PatientView/>}></Route>
       <Route path='/patient/:id' element={<PatientProfile />} />
       <Route path="/pprofile" element={<Patientinterface/>}/>

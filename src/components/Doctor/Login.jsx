@@ -52,7 +52,7 @@ const Login = () => {
       console.log('Doctor Status:', userStatus); // Log doctor status
   
       if (userStatus === 'Inactive') {
-        setError('Your account is inactive. Please contact support.');
+        setError('Your account is inactive. Please contact with Docere303@gmail.com.');
       } else {
         // Redirect to the doctor's user page with their ID
         navigate(`/doctor/${userId}`); // Assuming the route is '/doctor/:userId'

@@ -12,11 +12,12 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
-
+import Loading from '../Doctor/Loading';
 import AdminDashboard from './Interfac';
 
 const DoctorList = () => {
   const [doctors, setDoctors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const toggleStatus = async (id) => {
     try {
@@ -32,9 +33,21 @@ const DoctorList = () => {
   useEffect(() => {
     // Fetch data from the backend when the component mounts
     axios.get('http://localhost:5007/api/doctors')
-      .then(response => setDoctors(response.data))
-      .catch(error => console.error(error));
+      .then(response => {
+        setDoctors(response.data);
+        // Set loading to false after fetching data
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error(error);
+        // Set loading to false in case of an error
+        setIsLoading(false);
+      });
   }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#77d5cb' }}>

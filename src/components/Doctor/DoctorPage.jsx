@@ -26,6 +26,7 @@ import CheckCircleOutlineTwoToneIcon from '@mui/icons-material/CheckCircleOutlin
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import Loading from "./Loading"; 
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 const drawerWidth = 240;
@@ -56,7 +57,7 @@ useEffect(() => {
         setDoctorDetails(doctorResponse.data);
         setAppointments(appointmentsResponse.data);
         setIsLoading(false); // Set loading to false after fetching data
-      }, 5000); // 60000 milliseconds = 1 minute
+      }, 3000); // 60000 milliseconds = 1 minute
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -85,6 +86,17 @@ useEffect(() => {
     setEditData(appointment);
     setEditMode(true);
   };
+
+  const handleDeleteAppointment = async (appointmentId) => {
+    try {
+      await axios.delete(`http://localhost:5007/api/appointments/${appointmentId}`);
+      // Remove the deleted appointment from the appointments state
+      setAppointments(appointments.filter(appointment => appointment._id !== appointmentId));
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+    }
+  };
+
   const handleSaveEdit = async () => {
     try {
       // Make an API call to update the appointment with editData
@@ -214,6 +226,9 @@ useEffect(() => {
                     </Button>
                     <Button onClick={() => handleAppointmentStatusChange(appointment._id, 'successful')} style={{ color: '#77d5cb' }}>
                       Confirm
+                    </Button>
+                    <Button onClick={() => handleDeleteAppointment(appointment._id)}>
+                      <DeleteIcon />
                     </Button>
 
                   </>

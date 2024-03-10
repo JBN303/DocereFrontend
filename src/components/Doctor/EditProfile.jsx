@@ -9,8 +9,12 @@ import {
   Container,
   createTheme,
   ThemeProvider,
+  Paper,
+  InputAdornment,
 } from '@mui/material';
 import styled from '@emotion/styled';
+import Avatar from '@mui/material/Avatar';
+import FolderIcon from '@mui/icons-material/Folder';
 
 const theme = createTheme({
   palette: {
@@ -26,6 +30,7 @@ const CustomContainer = styled(Container)({
   alignItems: 'center',
   marginTop: '65px',
   backgroundColor: '#fff',
+  
   borderRadius: '8px',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 });
@@ -34,8 +39,8 @@ function EditProfile() {
   const { userId } = useParams();
   const [userData, setUserData] = useState({});
 
-  const [certFile, setCertFile] = useState(null);
-  const [picFile, setPicFile] = useState(null);
+  const [CertificateFile, setCertificateFile] = useState(null);
+  const [profileFile, setprofileFile] = useState(null);
   const [initialUserData, setInitialUserData] = useState({});
 
 
@@ -78,8 +83,8 @@ function EditProfile() {
       }
 
       // Remove cert and pic fields from updatedData
-      delete updatedData.cert;
-      delete updatedData.pic;
+      delete updatedData.Certificate;
+      delete updatedData.profile;
 
       // Send only the changed data for updating
       await axios.put(`http://localhost:5007/api/updatedoctors/${userId}`, updatedData);
@@ -91,17 +96,17 @@ function EditProfile() {
   };
 
 
-  const handleCertFileChange = async (e) => {
+  const handleCertificateFileChange = async (e) => {
     const file = e.target.files[0];
     console.log("Selected certificate file:", file);
-    setCertFile(file);
+    setCertificateFile(file);
   
     try {
       const formData = new FormData();
-      formData.append('cert', file);
+      formData.append('certificate', file);
   
       // Send the certificate file to the server
-      const response = await axios.post(`http://localhost:5007/api/doctors/upload-cert/${userId}`, formData, {
+      const response = await axios.post(`http://localhost:5007/api/doctors/upload-certificate/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -115,17 +120,17 @@ function EditProfile() {
     }
   };
   
-  const handlePicFileChange = async (e) => {
+  const handleprofileFileChange = async (e) => {
     const file = e.target.files[0];
     console.log("Selected picture file:", file);
-    setPicFile(file);
+    setprofileFile(file);
   
     try {
       const formData = new FormData();
-      formData.append('pic', file);
+      formData.append('profile', file);
   
       // Send the picture file to the server
-      const response = await axios.post(`http://localhost:5007/api/doctors/upload-pic/${userId}`, formData, {
+      const response = await axios.post(`http://localhost:5007/api/doctors/upload-profile/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -141,10 +146,12 @@ function EditProfile() {
 
   return (
     <ThemeProvider theme={theme}>
-    <CustomContainer maxWidth="md">
+    <CustomContainer component="main" maxWidth="xs">
+    <Paper elevation={3} style={{ padding: '20px', width: '800px' }}>
       <Typography variant="h5" align="center" gutterBottom>
         Edit Profile
       </Typography>
+      <br></br>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -152,7 +159,7 @@ function EditProfile() {
               fullWidth
               label="NMC UID"
               name="uid"
-              value={userData.uid || ''}
+              value={userData.nmc || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -179,7 +186,7 @@ function EditProfile() {
               fullWidth
               label="Specialization"
               name="spec"
-              value={userData.spec || ''}
+              value={userData.gender || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -188,7 +195,7 @@ function EditProfile() {
               fullWidth
               label="Education"
               name="edu"
-              value={userData.edu || ''}
+              value={userData.experience || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -197,7 +204,7 @@ function EditProfile() {
               fullWidth
               label="Experience"
               name="exp"
-              value={userData.exp || ''}
+              value={userData.languages || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -206,7 +213,7 @@ function EditProfile() {
               fullWidth
               label="Languages"
               name="lang"
-              value={userData.lang || ''}
+              value={userData.location || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -215,7 +222,7 @@ function EditProfile() {
               fullWidth
               label="Location"
               name="locat"
-              value={userData.locat || ''}
+              value={userData.pincode || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -224,7 +231,7 @@ function EditProfile() {
               fullWidth
               label="Consultation Fee"
               name="conslt"
-              value={userData.conslt || ''}
+              value={userData.specialization || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -233,28 +240,48 @@ function EditProfile() {
               fullWidth
               label="Consultation Type"
               name="type"
-              value={userData.type || ''}
+              value={userData.qualification || ''}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={6}>
-            <input
+            <TextField
+            label="Profile"
               accept="image/*"
-              id="pic"
-              name="pic"
+              id="profile"
+              name="profile"
               type="file"
-              onChange={handlePicFileChange}
-              style={{ display: 'block' }} // Change display style to block to make it visible
+              onChange={handleprofileFileChange}
+              style={{ display: 'block' }} 
+              margin="normal"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Avatar>☺</Avatar>
+                  </InputAdornment>
+                ),
+              }}// Change display style to block to make it visible
             />
+            
           </Grid>
+          
           <Grid item xs={6}>
-            <input
+            <TextField
+            label="Certificate"
               accept="image/*"
-              id="cert"
-              name="cert"
+              id="certificate"
+              name="certificate"
               type="file"
-              onChange={handleCertFileChange}
-              style={{ display: 'block' }} // Change display style to block to make it visible
+              onChange={handleCertificateFileChange}
+              style={{ display: 'block' }}
+              margin="normal"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FolderIcon />
+                  </InputAdornment>
+                ),
+              }} // Change display style to block to make it visible
             />
           </Grid>
 
@@ -265,7 +292,7 @@ function EditProfile() {
               fullWidth
               label="Phone Number"
               name="phn"
-              value={userData.phn || ''}
+              value={userData.phone || ''}
               onChange={handleChange}
             />
           </Grid>
@@ -284,8 +311,6 @@ function EditProfile() {
               label="New Password"
               name="npass"
               type="password"
-              value={userData.npass || ''}
-              onChange={handleChange}
             />
           </Grid>
           <Grid item xs={6}>
@@ -322,6 +347,7 @@ function EditProfile() {
       </Typography>
         
       </form>
+      </Paper>
       </CustomContainer>
     </ThemeProvider>
   );

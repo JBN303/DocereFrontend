@@ -12,7 +12,6 @@ import DoctorList from './components/Admin/DoctorList';
 import Demo from "./components/Demo";
 import PatientView from "./components/Admin/PatientView";
 import PatientProfile from "./components/Patient/PatientProfile";
-import Patientinterface from "./components/Patientinterface";
 import Psidebar from "./components/Patient/Psidebar";
 import SpecializationTabs from "./components/Patient/Specialization";
 import Nearby from "./components/Patient/Nearby";
@@ -25,28 +24,31 @@ function App() {
     <div>
  <BrowserRouter>
     <Routes>
+
       <Route path='/' element={<Interface/>}></Route>
-      
-      <Route path='/login' element={<Login/>}></Route>
-      <Route path='/patient login' element={<Plogin/>}></Route>
-      
+      <Route path="/load" element={<Loading/>}/>
+
+      //doctor
       <Route path='/register' element={<SignUp />}></Route>
-      <Route path='/patient register' element={<Psignup />}></Route>
-      <Route path='/admin' element={<AdminLogin />}></Route>
-      <Route path='/doctorview' element={<DoctorList />}></Route>
-      <Route path="/edit/:userId" element={<EditProfile/>} />
+      <Route path='/login' element={<Login/>}></Route>
       <Route path="/doctor/:userId" element={<DoctorPage />} />
+      <Route path="/edit/:userId" element={<EditProfile/>} />
+
+     //patient
+      <Route path='/patient register' element={<Psignup />}></Route>
+      <Route path='/patient login' element={<Plogin/>}></Route>
+      <Route path="/psidebar/:id" element={<Psidebar/>}/>
+      <Route path='/patient/:id' element={<PatientProfile />} />
+      <Route path="/spec/:id" element={<SpecializationTabs/>}/>
+      <Route path="/near/:id" element={<Nearby/>}/>
+      <Route path="/myapp/:id" element={<MyAppointments/>}/>
+      
+      //admin
+      <Route path='/admin' element={<AdminLogin />}></Route>
       <Route path='/admindashboard' element={<Interfac/>}></Route>
      <Route path="/dash" element={<AdminDash/>}></Route>
       <Route path='/pview' element={<PatientView/>}></Route>
-      <Route path='/patient/:id' element={<PatientProfile />} />
-      <Route path="/pprofile" element={<Patientinterface/>}/>
-      <Route path="/psidebar/:id" element={<Psidebar/>}/>
-      <Route path="/spec/:id" element={<SpecializationTabs/>}/>
-      <Route path="/near/:id" element={<Nearby/>}/>
-      <Route path="/demo" element={<Demo/>}/>
-      <Route path="/myapp/:id" element={<MyAppointments/>}/>
-      <Route path="/load" element={<Loading/>}/>
+      <Route path='/doctorview' element={<DoctorList />}></Route>
     </Routes> 
     </BrowserRouter>
     

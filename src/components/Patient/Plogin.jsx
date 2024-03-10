@@ -22,7 +22,7 @@ const CustomContainer = styled(Container)({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  marginTop: '200px',
+  marginTop: '300px',
   backgroundColor: '#fff',
   padding: '2rem',
   borderRadius: '8px',

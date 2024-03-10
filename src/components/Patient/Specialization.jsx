@@ -16,6 +16,12 @@ import FormControl from '@mui/material/FormControl';
 import {MenuItem} from '@mui/material';
 import { Select } from '@mui/material';
 import Loading from '../Doctor/Loading';
+import {
+  createTheme,
+  ThemeProvider,
+  CssBaseline,
+} from '@mui/material';
+import { LinearProgress } from '@mui/material';
 
 export default function SpecializationTabs() {
   const { id } = useParams();
@@ -24,6 +30,7 @@ export default function SpecializationTabs() {
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [error, setError] = useState('');
   const [appointmentDetails, setAppointmentDetails] = useState({
     appno:'',
     patientName: '',
@@ -34,11 +41,21 @@ export default function SpecializationTabs() {
     time:'',
     msg:'',
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#77d5cb', // Set your primary color
+      },
+    },
+  });
   const [value, setValue] = React.useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true); // Set loading to true when starting data fetching
+
         // Fetch patient data
         const patientResponse = await axios.get(`http://localhost:5007/api/user/${id}`);
         setPatientData(patientResponse.data);
@@ -46,8 +63,11 @@ export default function SpecializationTabs() {
         // Fetch list of doctors
         const doctorsResponse = await axios.get('http://localhost:5007/api/doctors');
         setDoctors(doctorsResponse.data);
+
+        setIsLoading(false); // Set loading to false after fetching data
       } catch (error) {
         console.error('Error fetching patient data or doctors:', error);
+        setIsLoading(false); // Set loading to false in case of an error
       }
     };
 
@@ -60,7 +80,7 @@ export default function SpecializationTabs() {
       const selectedSpecialization = getSpecializationLabel(value);
 
       // Filter doctors based on the selected specialization
-      const filtered = doctors.filter((doctor) => doctor.spec === selectedSpecialization);
+      const filtered = doctors.filter((doctor) => doctor.specialization === selectedSpecialization);
       setFilteredDoctors(filtered);
     };
 
@@ -70,19 +90,19 @@ export default function SpecializationTabs() {
   const getSpecializationLabel = (index) => {
     switch (index) {
       case 0:
-        return 'General Medicine';
-      case 1:
-        return 'Pediatrics';
-      case 2:
-        return 'diabetology & endocrinology';
-      case 3:
-        return 'Pulmonology';
-      case 4:
-        return 'Family Medicine';
-      case 5:
         return 'General Physician';
+      case 1:
+        return 'Psychiatrist';
+      case 2:
+        return 'Pediatricians';
+      case 3:
+        return 'Cardiologist';
+      case 4:
+        return 'Oncologists';
+      case 5:
+        return 'ENT Specialist';
       case 6:
-        return 'Nutrition & Dietetics';
+        return 'Dentists';
       // Add more cases for other specializations if needed
       default:
         return '';
@@ -116,6 +136,16 @@ export default function SpecializationTabs() {
 
   const handleBookAppointment = async (doctorId) => {
     try {
+      if (
+        appointmentDetails.patientName === '' ||
+        appointmentDetails.age === '' ||
+        appointmentDetails.date === '' ||
+        appointmentDetails.day === 'any' ||
+        appointmentDetails.purpose === ''
+      ) {
+        setError('Fill in all details.');
+        return;
+      }
       const selectedDoctor = doctors.find((doctor) => doctor._id === doctorId);
 
       // You can customize the appointment details based on your requirements
@@ -131,7 +161,7 @@ export default function SpecializationTabs() {
         time: appointmentDetails.time,
         msg: appointmentDetails.msg,
         doctorName: selectedDoctor.name,
-        doctorLocation: selectedDoctor.locat,
+        doctorLocation: selectedDoctor.location,
         patientEmail: patientData.Email, // Make sure patientData contains email
         patientContactNo: patientData.Phone, // Make sure patientData contains phone number
       };
@@ -166,7 +196,9 @@ export default function SpecializationTabs() {
 
   return (
     <div>
-      
+      <ThemeProvider theme={theme}>
+        <CssBaseline/>
+        {isLoading && <LinearProgress />}
         <Tabs
           value={value}
           onChange={handleChange}
@@ -174,56 +206,53 @@ export default function SpecializationTabs() {
           textColor="primary"
           centered
         >
-          <Tab label="General Medicine" />
-          <Tab label="Pediatrics" />
-          <Tab label="Diabetology & Endocrinology" />
-          <Tab label="Pulmonology" />
-          <Tab label="Family Medicine" />
           <Tab label="General Physician" />
-          <Tab label="Nutrition & Dietetics" />
+          <Tab label="Psychiatrist" />
+          <Tab label="Pediatricians" />
+          <Tab label="Cardiologist" />
+          <Tab label="Oncologists" />
+          <Tab label="ENT Specialist" />
+          <Tab label="Dentists" />
           {/* Add more tabs for other specializations */}
         </Tabs>
         
 
       {filteredDoctors.length > 0 ? (
         <div>
-          <Box
-            display="flex"
-            flexWrap="wrap"
-            sx={{
-              flexGrow: 1,
-              p: 3,
-              backgroundColor: 'white',
-            }}
-          >
+<Box sx={{ display: 'flex', marginTop: '20px', flexWrap: 'wrap' }}>
             {filteredDoctors.map((doctor) => (
-              <Card key={doctor._id} sx={{ maxWidth: 345, margin: 2 }}>
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={`data:image/jpeg;base64,${doctor.pic}`}
-                    alt="Profile"
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {doctor.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Age: {doctor.age}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Specialty: {doctor.spec}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Language: {doctor.lang}
-                    </Typography>
-                    <Button onClick={() => handleOpenModal(doctor)} style={{ color: '#77d5cb' }}>
-                      Book Appointment
-                    </Button>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
+              <Card key={doctor._id} sx={{ display: 'flex', margin: 2, width: 500 }}>
+              <CardMedia
+        component="img"
+        sx={{ width: 181 }}
+        image={`data:image/jpeg;base64,${doctor.profile}`}
+        alt="Profile"
+      />
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <CardContent sx={{ flex: '1 0 auto' }}>
+          <Typography component="div" variant="h5">
+           Dr.{doctor.name}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+          {doctor.gender},{doctor.age}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {doctor.qualification}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Specialty: {doctor.specialization}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Languages: {doctor.languages}
+          </Typography>
+        </CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'center', pl: 2, pb: 2 }}>
+          <Button onClick={() => handleOpenModal(doctor)} style={{ color: '#77d5cb' }}>
+            Book Appointment
+          </Button>
+        </Box>
+      </Box>
+    </Card>
             ))}
           </Box>
         </div>
@@ -251,7 +280,7 @@ export default function SpecializationTabs() {
             }}
           >
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              {selectedDoctor.name}
+              Dr.{selectedDoctor.name}
             </Typography>
             <TextField
               label="Patient Name"
@@ -271,7 +300,7 @@ export default function SpecializationTabs() {
               value={appointmentDetails.age}
               onChange={handleInputChange}
             />
-            <Typography>date</Typography>
+            <Typography>Date</Typography>
             <TextField
               
               type="date" // Input type for date
@@ -283,15 +312,16 @@ export default function SpecializationTabs() {
               onChange={handleInputChange}
             />
             <FormControl fullWidth variant="outlined" margin="normal">
-        <InputLabel htmlFor="time">Time</InputLabel>
+        <InputLabel htmlFor="time">Preferable Section</InputLabel>
             <Select
               id="time"
+              label="Preferable Section"
               name="day"
               value={appointmentDetails.day}
               onChange={handleInputChange}
               style={{ width: '100%', marginBottom: '16px' }}
             >
-              <MenuItem value="morning">Any</MenuItem>
+              <MenuItem value="any">Any</MenuItem>
               <MenuItem value="morning">Morning</MenuItem>
               <MenuItem  value="noon">Noon</MenuItem >
               <MenuItem  value="evening">Evening</MenuItem >
@@ -302,6 +332,8 @@ export default function SpecializationTabs() {
               label="Purpose of Appointment"
               variant="outlined"
               fullWidth
+              multiline
+              rows={2}
               margin="normal"
               name="purpose"
               value={appointmentDetails.purpose}
@@ -310,9 +342,15 @@ export default function SpecializationTabs() {
             <Button onClick={() => handleBookAppointment(selectedDoctor._id)} style={{ color: '#77d5cb' }}>
               BOOK NOW
             </Button>
+            {error && (
+                <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
+                  {error}
+                </Typography>
+              )}
           </Box>
         </Modal>
       )}
+      </ThemeProvider>
     </div>
   );
 }

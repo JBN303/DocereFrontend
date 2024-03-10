@@ -14,7 +14,6 @@ import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
 import Loading from '../Doctor/Loading';
-import AdminDashboard from './Interfac';
 
 const theme = createTheme();
 
@@ -50,30 +49,30 @@ const PatientView = () => {
   };
 
   return (
-<AppBar position="static" sx={{ backgroundColor: '#77d5cb' }}>
+
     <div>
-      <AdminDashboard/>
+      
         <Toolbar>
         
           <Typography variant="h6" component="div">
-            User List
+            Users List
           </Typography>
         </Toolbar>
       
 
         <TableContainer component={Paper}>
         
-        <Table sx={{ minWidth: 650 }} aria-label="doctor table" style={{marginLeft:"13%"}}>
+        <Table sx={{ minWidth: 650 }} aria-label="doctor table" >
         <TableHead>
             <TableRow>
             <TableCell style={{ fontWeight: 'bold' }}>Status</TableCell>
-                <TableCell >Name</TableCell>
+            <TableCell >First Name</TableCell>
+                <TableCell >Last Name</TableCell>
+                <TableCell >Age</TableCell>
+                <TableCell >Gender</TableCell>
                 <TableCell >Address</TableCell>
                 <TableCell >Phone</TableCell>
                 <TableCell >Email</TableCell>
-                <TableCell >Age</TableCell>
-                <TableCell >Gender</TableCell>
-                <TableCell >Username</TableCell>
                 <TableCell >Password</TableCell>
                 <TableCell >Change Status</TableCell>
               </TableRow>
@@ -82,13 +81,13 @@ const PatientView = () => {
               {user.map(patient => (
                 <TableRow  key={patient._id}>
                   <TableCell>{patient.status === 'active' ? 'Active' : 'Inactive'}</TableCell>
+                  <TableCell>{patient.Username}</TableCell>
                   <TableCell>{patient.Name}</TableCell>
+                  <TableCell>{patient.Age}</TableCell>
+                  <TableCell>{patient.Gender}</TableCell>
                   <TableCell>{patient.Address}</TableCell>
                   <TableCell>{patient.Phone}</TableCell>
                   <TableCell>{patient.Email}</TableCell>
-                  <TableCell>{patient.Age}</TableCell>
-                  <TableCell>{patient.Gender}</TableCell>
-                  <TableCell>{patient.Username}</TableCell>
                   <TableCell>{patient.Password}</TableCell>
                   <TableCell>
                   <Button
@@ -104,7 +103,7 @@ const PatientView = () => {
         </Table>
       </TableContainer>
     </div>
-    </AppBar>
+    
   );
 };
 

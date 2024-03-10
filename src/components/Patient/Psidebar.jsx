@@ -28,6 +28,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import MyAppointments from './MyAppointments'
 import Loading from '../Doctor/Loading';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
 const drawerWidth = 240;
 
@@ -51,14 +53,12 @@ const Psidebar = () => {
           axios.get(`http://localhost:5007/api/user/${id}`),
           axios.get('http://localhost:5007/api/doctors'),
         ]);
-
-        setTimeout(() => {
-          setPatientData(patientResponse.data);
-          setDoctors(doctorsResponse.data);
   
-          // Set loading to false after fetching data
-          setIsLoading(false);
-        }, 3000);
+        setPatientData(patientResponse.data);
+        setDoctors(doctorsResponse.data);
+  
+        // Set loading to false after fetching data
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching patient data or doctors:', error);
         // Set loading to false in case of an error
@@ -98,19 +98,21 @@ const Psidebar = () => {
       >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
+        <Divider/>
           <List>
-            <Typography variant="h6">
+          <Card sx={{ textAlign: 'center', padding: '10px', marginBottom: '10px' }}>
+          <Typography component="h1" variant="h5">
               {/* <Avatar src="/broken-image.jpg" /> */}
               Welcome,
               {patientData ? `${patientData.Username}` : 'Loading...'}
             </Typography>
-            <Typography>
+            <Typography variant="subtitle1" gutterBottom>
               {patientData ? `${patientData.Email}` : 'Loading...'}
             </Typography>
+            </Card>
           </List>
-<Divider/>
           <List>
-            {['All Doctors', 'Doctors Nearby','Specialities','My Appoinments'].map((text, index) => (
+            {['All Doctors', 'Doctors Nearby','Specialties','My Appointments'].map((text, index) => (
               <ListItem
                 key={text}
                 disablePadding
@@ -172,7 +174,7 @@ const Psidebar = () => {
         </Grid>
         )}
 
-        {selectedMenuItem === 'Specialities' && (
+        {selectedMenuItem === 'Specialties' && (
           <Grid container spacing={3}>
           <Grid item xs={12} md={12}>
             <SpecializationTabs/>
@@ -182,7 +184,7 @@ const Psidebar = () => {
         )}
         
 
-{selectedMenuItem === 'My Appoinments' && (
+{selectedMenuItem === 'My Appointments' && (
           <Grid container spacing={3}>
           <Grid item xs={12} md={12}>
             <MyAppointments/>

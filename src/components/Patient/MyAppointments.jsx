@@ -51,11 +51,11 @@ const MyAppointments = () => {
           {appointments.map(appointment => (
             <Card key={appointment._id} sx={{ minWidth: 275, margin: 2 }}>
               <CardContent>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+              <Typography sx={{ fontSize: 14, color: appointment.status === 'pending' ? '#FFC300' : '#28B463' }} gutterBottom>
                   Appointment {appointment.status}
                 </Typography>
                 <Typography variant="h5" component="div">
-                  {appointment.doctorName}
+                  Dr.{appointment.doctorName}
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
                   Appointment no: {appointment.appno}

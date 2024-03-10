@@ -23,8 +23,10 @@ function Interface() {
                     <button className="dropbtn non-style-link nav-item">LOGIN</button>
                   </td>
                   <div className="dropdown-content">
-                    <a href="patient login">PATIENT</a>
+                    <a href="patient login">USER</a>
                     <a href="login">DOCTOR</a>
+                    <a href="admin">ADMIN</a>
+
                   </div>
                 </div>
               </td>
@@ -70,12 +72,12 @@ function Interface() {
         <p className="sub-text2 footer-hashen">DEVELOPED BY ATHUL & JIBIN</p>
 
         {/* About details section */}
-        <div style={{ marginTop: '50px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px', backgroundColor: '#f9f9f9' }}>
+        {/* <div style={{ marginTop: '50px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px', backgroundColor: '#f9f9f9' }}>
           <h2>About Us</h2>
           <p>We are a team dedicated to revolutionizing healthcare by providing convenient and accessible solutions for patients and doctors alike.</p>
           <p>Our mission is to make healthcare easy and accessible to everyone, ensuring that people can lead healthier and happier lives.</p>
           <p>Contact us: example@example.com</p>
-        </div>
+        </div> */}
       </center>
     </div>
   );

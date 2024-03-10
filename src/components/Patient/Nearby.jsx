@@ -11,7 +11,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import Loading from '../Doctor/Loading';
-
+import {
+  createTheme,
+  ThemeProvider,
+  CssBaseline,
+} from '@mui/material';
+import { LinearProgress } from '@mui/material';
 
 const Nearby = () => {
   const { id } = useParams();
@@ -21,6 +26,7 @@ const Nearby = () => {
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [error, setError] = useState('');
   const [appointmentDetails, setAppointmentDetails] = useState({
     appno:'',
     patientName: '',
@@ -31,10 +37,20 @@ const Nearby = () => {
     time:'',
     msg:'',
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#77d5cb', // Set your primary color
+      },
+    },
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true); // Set loading to true when starting data fetching
+
         // Fetch patient data
         const patientResponse = await axios.get(`http://localhost:5007/api/user/${id}`);
         setPatientData(patientResponse.data);
@@ -42,8 +58,11 @@ const Nearby = () => {
         // Fetch list of doctors
         const doctorsResponse = await axios.get('http://localhost:5007/api/doctors');
         setDoctors(doctorsResponse.data);
+
+        setIsLoading(false); // Set loading to false after fetching data
       } catch (error) {
         console.error('Error fetching patient data or doctors:', error);
+        setIsLoading(false); // Set loading to false in case of an error
       }
     };
 
@@ -51,7 +70,7 @@ const Nearby = () => {
   }, [id]);
 
   const handleSearch = () => {
-    const filtered = doctors.filter((doctor) => doctor.conslt === pincode);
+    const filtered = doctors.filter((doctor) => doctor.pincode === pincode);
     setFilteredDoctors(filtered);
   };
 
@@ -74,6 +93,16 @@ const Nearby = () => {
 
   const handleBookAppointment = async (doctorId) => {
     try {
+      if (
+        appointmentDetails.patientName === '' ||
+        appointmentDetails.age === '' ||
+        appointmentDetails.date === '' ||
+        appointmentDetails.day === 'any' ||
+        appointmentDetails.purpose === ''
+      ) {
+        setError('Fill in all details.');
+        return;
+      }
       const appointmentDetailsToSend = {
         patientId: id,
         doctorId,
@@ -86,7 +115,7 @@ const Nearby = () => {
         time: appointmentDetails.time,
         msg: appointmentDetails.msg,
         doctorName: selectedDoctor.name,
-        doctorLocation: selectedDoctor.locat,
+        doctorLocation: selectedDoctor.location,
         patientEmail: patientData.Email, // Make sure patientData contains email
         patientContactNo: patientData.Phone, // Make sure patientData contains phone number
       };
@@ -115,6 +144,9 @@ const Nearby = () => {
 
   return (
     <div>
+      <ThemeProvider theme={theme}>
+        <CssBaseline/>
+        {isLoading && <LinearProgress />}
       <Paper
         component="form"
         sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, margin: 'auto' }}
@@ -133,35 +165,40 @@ const Nearby = () => {
       {/* <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
         <Typography variant="h5">Nearby Doctors</Typography>
       </Box> */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', marginTop: '20px', flexWrap: 'wrap' }}>
         {filteredDoctors.map((doctor) => (
-         <Card key={doctor._id} sx={{ maxWidth: 345, margin: 2 }}>
-         <CardActionArea>
-           <CardMedia
-             component="img"
-             height="140"
-             image={`data:image/jpeg;base64,${doctor.pic}`}
-             alt="Profile"
-           />
-           <CardContent>
-             <Typography gutterBottom variant="h5" component="div">
-               {doctor.name}
-             </Typography>
-             <Typography variant="body2" color="text.secondary">
-               Age: {doctor.age}
-             </Typography>
-             <Typography variant="body2" color="text.secondary">
-               Specialty: {doctor.spec}
-             </Typography>
-             <Typography variant="body2" color="text.secondary">
-               Language: {doctor.lang}
-             </Typography>
-             <Button onClick={() => handleOpenModal(doctor)} style={{ color: '#77d5cb' }}>
-               Book Appointment
-             </Button>
-           </CardContent>
-         </CardActionArea>
-       </Card>
+         <Card key={doctor._id} sx={{ display: 'flex', margin: 2, width: 500 }}>
+         <CardMedia
+   component="img"
+   sx={{ width: 181 }}
+   image={`data:image/jpeg;base64,${doctor.profile}`}
+   alt="Profile"
+ />
+ <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+   <CardContent sx={{ flex: '1 0 auto' }}>
+     <Typography component="div" variant="h5">
+       Dr.{doctor.name}
+     </Typography>
+     <Typography variant="body1" color="text.secondary">
+     {doctor.gender},{doctor.age}
+     </Typography>
+     <Typography variant="body1" color="text.secondary">
+       {doctor.qualification}
+     </Typography>
+     <Typography variant="body1" color="text.secondary">
+       Specialty: {doctor.specialization}
+     </Typography>
+     <Typography variant="body1" color="text.secondary">
+       Languages: {doctor.languages}
+     </Typography>
+   </CardContent>
+   <Box sx={{ display: 'flex', alignItems: 'center', pl: 2, pb: 2 }}>
+     <Button onClick={() => handleOpenModal(doctor)} style={{ color: '#77d5cb' }}>
+       Book Appointment
+     </Button>
+   </Box>
+ </Box>
+</Card>
         ))}
       </Box>
       {selectedDoctor && (
@@ -204,7 +241,7 @@ const Nearby = () => {
               value={appointmentDetails.age}
               onChange={handleInputChange}
             />
-            <Typography>date</Typography>
+            <Typography>Date</Typography>
             <TextField
               
               type="date" // Input type for date
@@ -216,9 +253,9 @@ const Nearby = () => {
               onChange={handleInputChange}
             />
             <FormControl fullWidth variant="outlined" margin="normal">
-        <InputLabel htmlFor="time">Time</InputLabel>
+        <InputLabel htmlFor="time">Preferable Section</InputLabel>
             <Select
-              id="time"
+              label="Preferable Section"
               name="day"
               value={appointmentDetails.day}
               onChange={handleInputChange}
@@ -243,9 +280,15 @@ const Nearby = () => {
             <Button onClick={() => handleBookAppointment(selectedDoctor._id)} style={{ color: '#77d5cb' }}>
               BOOK NOW
             </Button>
+            {error && (
+              <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
+                {error}
+              </Typography>
+            )}
           </Box>
         </Modal>
       )}
+      </ThemeProvider>
     </div>
   );
 };

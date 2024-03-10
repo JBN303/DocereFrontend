@@ -46,27 +46,28 @@ const CustomContainer = styled(Container)({
 
 function SignUp() {
   const [inputs, setInputs] = useState({
-    uid: '',
+    nmc: '', // Change 'uid' to 'nmc'
     name: '',
     age: '',
-    spec: '',
-    edu: '',
-    exp: '',
-    lang: '',
-    locat: '',
-    conslt: '',
-    type: '',
-    cert: '',
-    pic: '',
-    about: '',
-    phn: '',
+    gender: '', // Change 'type' to 'gender'
+    experience: '', // Change 'exp' to 'experience'
+    languages: [], // Change 'lang' to 'languages'
+    location: '',
+    pincode: '', // Change 'conslt' to 'pincode'
+    specialization: '',
+    qualification: [], // Change 'edu' to 'qualification'
+    profile: '',
+    Certificate: '',
+    phone: '', // Change 'phn' to 'phone'
     email: '',
     cpass: '',
+    about: '',
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState(null); 
   const [previewCert, setPreviewCert] = useState(null); 
+  const [error, setError] = useState(null); 
   const navigate = useNavigate();
 
   const InputHandler = (event) => {
@@ -81,8 +82,19 @@ function SignUp() {
 
 // Add FormData to handle file uploads
 const SaveData = () => {
+  // Check if any required field is empty
+  const requiredFields = ['nmc', 'name', 'age', 'gender', 'experience', 'languages', 'location', 'pincode', 'specialization', 'qualification', 'profile', 'Certificate', 'phone', 'email', 'cpass'];
+  const missingFields = requiredFields.filter(field => !inputs[field]);
+
+  if (missingFields.length > 0) {
+    setError('Fill all details'); // Set error message
+    return;
+  }
+
+  setError(null); // Clear error message if all fields are filled
+
   const formData = new FormData();
-  
+
   // Append all fields to formData
   Object.entries(inputs).forEach(([key, value]) => {
     formData.append(key, value);
@@ -90,7 +102,7 @@ const SaveData = () => {
 
   axios.post("http://localhost:5007/api/dnew", formData, {
     headers: {
-      'Content-Type': 'multipart/form-data' // Important for file uploads
+      'Content-Type': 'multipart/form-data'
     }
   })
     .then((response) => {
@@ -101,7 +113,7 @@ const SaveData = () => {
 };
 const handleProfilePhotoChange = (event) => {
   const file = event.target.files[0];
-  setInputs((inputs) => ({ ...inputs, pic: file }));
+  setInputs((inputs) => ({ ...inputs, profile: file }));
 
   // Display the selected profile photo
   const reader = new FileReader();
@@ -113,7 +125,7 @@ const handleProfilePhotoChange = (event) => {
 
 const handleCertificateChange = (event) => {
   const file = event.target.files[0];
-  setInputs((inputs) => ({ ...inputs, cert: file }));
+  setInputs((inputs) => ({ ...inputs, Certificate: file }));
 
   // Display the selected certificate
   const reader = new FileReader();
@@ -140,31 +152,38 @@ const handleCertificateChange = (event) => {
           <form>
           <Grid container spacing={2}>
               <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="NMC UID"
-                  name="uid"
-                  type="number"
-                  placeholder="ex:1757"
-                  onChange={InputHandler}
-                  value={inputs.uid}
-                  margin="normal"
-                  InputProps={{
-                    pattern: '[0]{1}[0-9]{9}',
-                  }}
-                />
+              <TextField
+  fullWidth
+  label="NMC UID"
+  name="nmc" // Change 'uid' to 'nmc'
+  type="number"
+  placeholder="ex:1757"
+  onChange={InputHandler}
+  value={inputs.nmc}
+  margin="normal"
+  InputProps={{
+    pattern: '[0]{1}[0-9]{9}',
+  }}
+/>
               </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Full Name"
-                  name="name"
-                  placeholder="DR."
-                  onChange={InputHandler}
-                  value={inputs.name}
-                  margin="normal"
-                />
-              </Grid>
+<Grid item xs={6}>
+  <TextField
+    fullWidth
+    label="Full Name"
+    name="name"
+    placeholder="Enter your full name"
+    onChange={InputHandler}
+    value={inputs.name}
+    margin="normal"
+    InputProps={{
+      startAdornment: (
+        <InputAdornment position="start">
+          <Typography variant="body1">DR.</Typography>
+        </InputAdornment>
+      ),
+    }}
+  />
+</Grid>
               <Grid item xs={6}>
                 <TextField
                   fullWidth
@@ -177,148 +196,128 @@ const handleCertificateChange = (event) => {
                   margin="normal"
                 />
               </Grid>
-                            <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Qualification"
-                  name="edu"
-                  placeholder="MBBS, MD, ..."
-                  onChange={InputHandler}
-                  value={inputs.edu}
-                  margin="normal"
-                />
-              </Grid>
               <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Experience"
-                  name="exp"
-                  placeholder="in years"
-                  onChange={InputHandler}
-                  value={inputs.exp}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Language"
-                  name="lang"
-                  placeholder=""
-                  onChange={InputHandler}
-                  value={inputs.lang}
-                  margin="normal"
-                />
-              </Grid>
-              {/* <Grid item xs={6}>
-  <Autocomplete
-    multiple
-    id="qualification"
-    options={['MBBS', 'MD', 'MS', 'Diploma', 'PhD', 'Other']}
-    defaultValue={[]}
-    isOptionEqualToValue={(option, value) => option === value}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        fullWidth
-        label="Qualification"
-        name="edu"
-        placeholder="Select Qualifications"
-        onChange={(event, value) => {
-          const selectedQualifications = value.join(',');
-          setInputs((inputs) => ({ ...inputs, edu: selectedQualifications }));
-        }}
-      />
-    )}
+  <FormControl fullWidth margin="normal">
+    <InputLabel>Gender</InputLabel>
+    <Select
+      name="gender" // Change 'type' to 'gender'
+      label="Gender"
+      value={inputs.gender}
+      onChange={InputHandler}
+    >
+      <MenuItem value="Male">Male</MenuItem>
+      <MenuItem value="Female">Female</MenuItem>
+      <MenuItem value="Both">Others</MenuItem>
+    </Select>
+  </FormControl>
+</Grid>
+
+<Grid item xs={6}>
+  <TextField
+    fullWidth
+    label="Experience"
+    name="experience" // Change 'exp' to 'experience'
+    placeholder="in years"
+    onChange={InputHandler}
+    value={inputs.experience}
+    margin="normal"
   />
 </Grid>
 
 <Grid item xs={6}>
-  <Autocomplete
-    multiple
-    id="language"
-    options={['English', 'French', 'Hindi', 'Spanish', 'German']}
-    defaultValue={[]}
-    isOptionEqualToValue={(option, value) => option === value}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        fullWidth
-        label="Language"
-        name="lang"
-        placeholder="Select Languages"
-        onChange={(event, value) => {
-          const selectedLanguages = value.join(',');
-          setInputs((inputs) => ({ ...inputs, lang: selectedLanguages }));
-        }}
-      />
-    )}
-  />
-</Grid> */}
+  <FormControl fullWidth margin="normal">
+    <InputLabel>Languages Known</InputLabel>
+    <Select
+      name="languages" // Change 'lang' to 'languages'
+      label="Languages Known"
+      value={inputs.languages}
+      onChange={(event) => setInputs({ ...inputs, languages: event.target.value })}
+      multiple
+      displayEmpty
+      renderValue={(selected) => (selected.length === 0 ? '' : selected.join(', '))}
+    >
+      {['English', 'Hindi', 'Malayalam', 'Tamil', 'Arabic'].map((language) => (
+        <MenuItem key={language} value={language}>
+          <Checkbox checked={inputs.languages.includes(language)} />
+          {language}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
 
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Location"
-                  name="locat"
-                  placeholder="exact Google Map Link"
-                  onChange={InputHandler}
-                  value={inputs.locat}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="pincode"
-                  name="conslt"
-                  placeholder=""
-                  onChange={InputHandler}
-                  value={inputs.conslt}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel>specialization</InputLabel>
-                  <Select
-                    name="spec"
-                    label="specialization"
-                    value={inputs.spec}
-                    onChange={InputHandler}
-                  >
-                    <MenuItem value="General medicine">General medicine</MenuItem>
-                    <MenuItem value="Pediatrics">Pediatrics</MenuItem>
-                    <MenuItem value="diabetology & endocrinology">diabetology & endocrinology</MenuItem>
-                    <MenuItem value="Pulmonology">Pulmonology</MenuItem>
-                    <MenuItem value="Family Medicine">Family Medicine</MenuItem>
-                    <MenuItem value="General Physician">General Physician</MenuItem>
-                    <MenuItem value="Nutrition & Dietetics">Nutrition & Dietetics</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel>Gender</InputLabel>
-                  <Select
-                    name="type"
-                    label="Gender"
-                    value={inputs.type}
-                    onChange={InputHandler}
-                  >
-                    <MenuItem value="online">Male</MenuItem>
-                    <MenuItem value="inclinic">Female</MenuItem>
-                    <MenuItem value="Both">Others</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
+<Grid item xs={6}>
   <TextField
     fullWidth
-    label="Profile Photo"
-    name="pic"
+    label="Location"
+    name="location" // Change 'locat' to 'location'
+    placeholder="exact Google Map Link"
+    onChange={InputHandler}
+    value={inputs.location}
+    margin="normal"
+  />
+</Grid>
+
+<Grid item xs={6}>
+  <TextField
+    fullWidth
+    label="Pincode"
+    name="pincode" // Change 'conslt' to 'pincode'
+    placeholder=""
+    onChange={InputHandler}
+    value={inputs.pincode}
+    margin="normal"
+  />
+</Grid>
+<Grid item xs={6}>
+  <FormControl fullWidth margin="normal">
+    <InputLabel>Specialization</InputLabel>
+    <Select
+      name="specialization"
+      label="Specialization"
+      value={inputs.specialization}
+      onChange={InputHandler}
+    >
+      <MenuItem value="General Physician">General Physician</MenuItem>
+      <MenuItem value="Psychiatrist">Psychiatrist</MenuItem>
+      <MenuItem value="Pediatricians">Pediatricians</MenuItem>
+      <MenuItem value="Cardiologist">Cardiologist</MenuItem>
+      <MenuItem value="Oncologists">Oncologists</MenuItem>
+      <MenuItem value="ENT Specialist">ENT Specialist</MenuItem>
+      <MenuItem value="Dentists">Dentists</MenuItem>
+    </Select>
+  </FormControl>
+</Grid>
+
+<Grid item xs={6}>
+  <FormControl fullWidth margin="normal">
+    <InputLabel>Qualifications</InputLabel>
+    <Select
+      name="qualification"
+      label="Qualifications"
+      value={inputs.qualification}
+      onChange={(event) => setInputs({ ...inputs, qualification: event.target.value })}
+      multiple
+      displayEmpty
+      renderValue={(selected) => (selected.length === 0 ? '' : selected.join(', '))}
+    >
+      {['MBBS', 'MD', 'MS', 'Diploma', 'PhD', 'Other'].map((qualification) => (
+        <MenuItem key={qualification} value={qualification}>
+          <Checkbox checked={inputs.qualification.includes(qualification)} />
+          {qualification}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
+
+<Grid item xs={6}>
+  <TextField
+    fullWidth
+    label="Profile"
+    name="profile"
     type="file"
-    onChange={handleProfilePhotoChange}
+    onChange={handleProfilePhotoChange} // Assuming this function is defined in your component
     margin="normal"
     InputProps={{
       startAdornment: (
@@ -333,45 +332,45 @@ const handleCertificateChange = (event) => {
     }}
   />
 </Grid>
+
 <Grid item xs={6}>
-    <TextField
-      fullWidth
-      label="Certificate"
-      name="cert"
-      type="file"
-      onChange={handleCertificateChange}
-      margin="normal"
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            {previewCert ? (
-              <Avatar alt="Certificate" src={previewCert} />
-            ) : (
-              <FolderIcon />
-            )}
-          </InputAdornment>
-        ),
-      }}
-    />
-  </Grid>
+  <TextField
+    fullWidth
+    label="Certificate"
+    name="Certificate"
+    type="file"
+    onChange={handleCertificateChange} // Assuming this function is defined in your component
+    margin="normal"
+    InputProps={{
+      startAdornment: (
+        <InputAdornment position="start">
+          {previewCert ? (
+            <Avatar alt="Certificate" src={previewCert} />
+          ) : (
+            <FolderIcon />
+          )}
+        </InputAdornment>
+      ),
+    }}
+  />
+</Grid>
 
 
-
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Mobile Number"
-                  name="phn"
-                  type="number"
-                  placeholder="ex: 9712345678"
-                  value={inputs.phn}
-                  onChange={InputHandler}
-                  margin="normal"
-                  InputProps={{
-                    pattern: '[0]{1}[0-9]{9}',
-                  }}
-                />
-              </Grid>
+<Grid item xs={6}>
+  <TextField
+    fullWidth
+    label="Phone"
+    name="phone"
+    type="number"
+    placeholder="ex: 9712345678"
+    value={inputs.phone}
+    onChange={InputHandler}
+    margin="normal"
+    InputProps={{
+      pattern: '[0]{1}[0-9]{9}',
+    }}
+  />
+</Grid>
               <Grid item xs={6}>
                 <TextField
                   fullWidth
@@ -445,7 +444,11 @@ const handleCertificateChange = (event) => {
             >
               Sign Up
             </Button>
-            
+            {error && (
+          <Typography variant="body2" color="error" align="center" style={{ marginTop: '10px' }}>
+            {error}
+          </Typography>
+        )}
             <Typography variant="subtitle1" align="center">
             Already have an account?<a href="login">
                     Login

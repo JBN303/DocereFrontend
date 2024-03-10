@@ -9,6 +9,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
 const theme = createTheme({
   palette: {
@@ -19,7 +20,7 @@ const theme = createTheme({
 });
 
 const CustomContainer = ({ children }) => (
-  <Container maxWidth="m" style={{ marginTop: '50px' }}>
+  <Container maxWidth="m" style={{ marginTop: '80px' }}>
     {children}
   </Container>
 );
@@ -34,7 +35,7 @@ const Psignup = () => {
     Username: '',//first name
     Password: '',
   });
-
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const InputHandler = (event) => {
@@ -43,9 +44,16 @@ const Psignup = () => {
   };
 
   const SaveData = () => {
-    axios.post("http://localhost:5007/api/pnew", inputs)
+    // Check if any field is empty
+    if (Object.values(inputs).some((value) => value === '')) {
+      setError('Fill in all details.');
+      return;
+    }
+
+    axios
+      .post('http://localhost:5007/api/pnew', inputs)
       .then((response) => {
-        alert("Record Saved");
+        alert('Record Saved');
         navigate('/Patient login');
       })
       .catch((err) => console.log(err));
@@ -89,6 +97,8 @@ const Psignup = () => {
             <TextField
               name="Address"
               label="Address"
+              multiline
+          rows={2}
               variant="outlined"
               fullWidth
               onChange={InputHandler}
@@ -116,14 +126,19 @@ const Psignup = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              name="Gender"
-              label="Gender"
-              variant="outlined"
-              fullWidth
-              onChange={InputHandler}
-              value={inputs.Gender}
-            />
+          <FormControl fullWidth margin="normal">
+    <InputLabel>Gender</InputLabel>
+    <Select
+      name="gender" // Change 'type' to 'gender'
+      label="Gender"
+      value={inputs.gender}
+      onChange={InputHandler}
+    >
+      <MenuItem value="Male">Male</MenuItem>
+      <MenuItem value="Female">Female</MenuItem>
+      <MenuItem value="Both">Others</MenuItem>
+    </Select>
+  </FormControl>
           </Grid>
           <Grid item xs={12}>
             <TextField
@@ -163,6 +178,17 @@ const Psignup = () => {
                             style={{ marginTop: '20px' }} onClick={SaveData}>
           Sign Up
         </Button>
+        
+        {error && (
+                <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
+                  {error}
+                </Typography>
+              )}
+                          <Typography variant="subtitle1" align="center">
+            Already have an account?<a href="login">
+                    Login
+                  </a>
+          </Typography>
         </Paper>
       </CustomContainer>
       </center>

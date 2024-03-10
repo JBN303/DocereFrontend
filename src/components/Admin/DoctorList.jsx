@@ -13,7 +13,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
 import Loading from '../Doctor/Loading';
-import AdminDashboard from './Interfac';
+
 
 const DoctorList = () => {
   const [doctors, setDoctors] = useState([]);
@@ -33,26 +33,14 @@ const DoctorList = () => {
   useEffect(() => {
     // Fetch data from the backend when the component mounts
     axios.get('http://localhost:5007/api/doctors')
-      .then(response => {
-        setDoctors(response.data);
-        // Set loading to false after fetching data
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.error(error);
-        // Set loading to false in case of an error
-        setIsLoading(false);
-      });
+      .then(response => setDoctors(response.data))
+      .catch(error => console.error(error));
   }, []);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#77d5cb' }}>
+    
     <div>
-      <AdminDashboard/>
+      
         <Toolbar>
         
           <Typography variant="h6" component="div">
@@ -61,20 +49,20 @@ const DoctorList = () => {
         </Toolbar>
       
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="doctor table" style={{marginLeft:"13%"}}>
+        <Table sx={{ minWidth: 650 }} aria-label="doctor table">
           <TableHead>
             <TableRow>
               <TableCell style={{ fontWeight: 'bold' }}>Status</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>NMC UID</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Profile Photo</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Name</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Doctor Name</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Age</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Specialty</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Qualification</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Gender</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Language</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Qualification</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>specialization</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Location</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Pincode</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }}>Consultation Type</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Certificate</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>About</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Mobile Number</TableCell>
@@ -87,24 +75,27 @@ const DoctorList = () => {
             {doctors.map(doctor => (
               <TableRow key={doctor._id}>
                 <TableCell style={{ fontWeight: 'bold' }}>{doctor.status === 'active' ? 'Active' : 'Inactive'}</TableCell>
-                <TableCell>{doctor.uid}</TableCell>
-                <TableCell>{doctor.pic && <img src={`data:image/jpeg;base64,${doctor.pic}`} alt="Profile" style={{ width: '50px', height: '50px' }} />}</TableCell>
+                <TableCell>{doctor.nmc}</TableCell>
+                <TableCell>{doctor.profile && <img src={`data:image/jpeg;base64,${doctor.profile}`} alt="Profile" style={{ width: '50px', height: '50px' }} />}</TableCell>
                 <TableCell>{doctor.name}</TableCell>
                 <TableCell>{doctor.age}</TableCell>
-                <TableCell>{doctor.spec}</TableCell>
-                <TableCell>{doctor.edu}</TableCell>
-                <TableCell>{doctor.lang}</TableCell>
+                <TableCell>{doctor.gender}</TableCell>
+                <TableCell>{doctor.languages}</TableCell>
+                <TableCell>{doctor.qualification}</TableCell>
+                <TableCell>{doctor.specialization}</TableCell>
+                
+                
                 <TableCell>
-                    <a href={doctor.locat} target="_blank" rel="noopener noreferrer">
+                    <a href={doctor.location} target="_blank" rel="noopener noreferrer">
                       View Location
                     </a>
                   </TableCell>
-                <TableCell>{doctor.conslt}</TableCell>
-                <TableCell>{doctor.type}</TableCell>
-                <TableCell> {doctor.cert && <img src={`data:image/jpeg;base64,${doctor.cert}`} alt="Certificate" style={{ width: '50px', height: '50px' }} />}</TableCell>
+                <TableCell>{doctor.pincode}</TableCell>
+  
+                <TableCell> {doctor.Certificate && <img src={`data:image/jpeg;base64,${doctor.Certificate}`} alt="Certificate" style={{ width: '50px', height: '50px' }} />}</TableCell>
                 
                 <TableCell>{doctor.about}</TableCell>
-                <TableCell>{doctor.phn}</TableCell>
+                <TableCell>{doctor.phone}</TableCell>
                 <TableCell>{doctor.email}</TableCell>
                 <TableCell>{doctor.cpass}</TableCell>
                 <TableCell>
@@ -124,7 +115,7 @@ const DoctorList = () => {
         </Table>
       </TableContainer>
     </div>
-    </AppBar>
+    
   );
 };
 

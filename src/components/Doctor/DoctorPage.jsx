@@ -26,8 +26,12 @@ import CheckCircleOutlineTwoToneIcon from '@mui/icons-material/CheckCircleOutlin
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import Loading from "./Loading"; 
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import {
+  createTheme,
+  ThemeProvider,
+} from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -43,6 +47,13 @@ const DoctorPage = () => {
   const handleLogout = () => {
     navigate('/login', { replace: true });
   };
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#77d5cb', // Set your primary color
+      },
+    },
+  });
 
 useEffect(() => {
   const fetchData = async () => {
@@ -66,21 +77,32 @@ useEffect(() => {
   fetchData();
 }, [userId]);
 
-  const handleAppointmentStatusChange = async (appointmentId, newStatus) => {
-    try {
-      await axios.put(`http://localhost:5007/api/appointments/status/${appointmentId}`, { status: newStatus });
-      // Update the appointments state after successful update
-      const updatedAppointments = appointments.map(appointment => {
-        if (appointment._id === appointmentId) {
-          return { ...appointment, status: newStatus };
-        }
-        return appointment;
-      });
-      setAppointments(updatedAppointments);
-    } catch (error) {
-      console.error('Error updating appointment status:', error);
+const handleAppointmentStatusChange = async (appointmentId, newStatus) => {
+  try {
+    const appointmentToUpdate = appointments.find(appointment => appointment._id === appointmentId);
+
+    // Add your validation checks here
+    if (!appointmentToUpdate.appno || !appointmentToUpdate.time || !appointmentToUpdate.date) {
+      // Show an error message or handle the validation failure appropriately
+      console.error('Please enter appointment number, time, and date before confirming.');
+      return;
     }
-  };
+
+    await axios.put(`http://localhost:5007/api/appointments/status/${appointmentId}`, { status: newStatus });
+
+    // Update the appointments state after successful update
+    const updatedAppointments = appointments.map(appointment => {
+      if (appointment._id === appointmentId) {
+        return { ...appointment, status: newStatus };
+      }
+      return appointment;
+    });
+
+    setAppointments(updatedAppointments);
+  } catch (error) {
+    console.error('Error updating appointment status:', error);
+  }
+};
 
   const handleEditAppointment = (appointment) => {
     setEditData(appointment);
@@ -114,8 +136,9 @@ useEffect(() => {
   }
 
   return (
+    
     <Box sx={{ display: 'flex', backgroundColor: 'white' , minHeight: 1000}}>
-      <CssBaseline />
+
       <AppBar position="fixed" sx={{ backgroundColor: '#77d5cb', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6" noWrap component="div">
@@ -126,6 +149,9 @@ useEffect(() => {
           </Button>
         </Toolbar>
       </AppBar>
+      <ThemeProvider theme={theme}>
+
+<CssBaseline />
       <Drawer
         variant="permanent"
         sx={{
@@ -136,20 +162,22 @@ useEffect(() => {
       >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
-          <List>
-            <Typography>
-              {doctorDetails.pic && (
-                <img
-                  src={`data:image/jpeg;base64,${doctorDetails.pic}`}
-                  alt="Profile"
-                  style={{ width: drawerWidth, height: '200px' }}
-                />
-              )}
-            </Typography>
-            <Typography sx={{ fontSize: 25 }}>{doctorDetails.name}</Typography>
-            <Typography>{doctorDetails.spec}</Typography>
-          </List>
-          <Divider />
+        <List>
+      <Card sx={{ textAlign: 'center', padding: '10px', marginBottom: '10px' }}>
+        {doctorDetails.profile && (
+          <img
+            src={`data:image/jpeg;base64,${doctorDetails.profile}`}
+            alt="Profile"
+            style={{ width: '100%', height: 'auto', borderRadius: '50%' }}
+          />
+        )}
+      
+      <Typography sx={{ fontSize: 25 }}>Dr.{doctorDetails.name}</Typography>
+      <Typography>{doctorDetails.specialization}</Typography>
+      </Card>
+    </List>
+    
+          
           <List>
             {['Appointments⋗'].map((text, index) => (
               <ListItem key={text} disablePadding>
@@ -185,12 +213,13 @@ useEffect(() => {
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls={`panel-${appointment._id}-content`}
                 id={`panel-${appointment._id}-header`}
+                
               >
                 
                 <Typography sx={{ width: '33%', flexShrink: 0 }}>
                    {appointment.patientName}
                 </Typography>
-                <Typography sx={{ color: 'text.secondary' }}>{appointment.status}</Typography>
+                <Typography sx={{ color: appointment.status === 'pending' ? '#FFC300' : '#28B463' }}>{appointment.status}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Card>
@@ -204,13 +233,13 @@ useEffect(() => {
                       Age: {appointment.age}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                    appointment date: {appointment.date}
+                    Appointment date: {appointment.date}
                     </Typography>
+                    {/* <Typography variant="body2" color="text.secondary">
+                    Preferred time: {appointment.day}
+                    </Typography> */}
                     <Typography variant="body2" color="text.secondary">
-                    preferred time: {appointment.day}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                    appointment time: {appointment.time}
+                    Appointment time: {appointment.time}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Contact No: {appointment.patientContactNo}
@@ -221,11 +250,8 @@ useEffect(() => {
                     <Typography variant="body2" color="text.secondary">
                       Purpose: {appointment.purpose}
                     </Typography>
-                    <Button onClick={() => handleEditAppointment(appointment)} style={{ color: '#77d5cb' }}>
-                      add
-                    </Button>
-                    <Button onClick={() => handleAppointmentStatusChange(appointment._id, 'successful')} style={{ color: '#77d5cb' }}>
-                      Confirm
+                    <Button onClick={() => handleEditAppointment(appointment)}style={{ color: "text.secondary" }}>
+                      <PendingActionsIcon/>
                     </Button>
                     <Button onClick={() => handleDeleteAppointment(appointment._id)}>
                       <DeleteIcon />
@@ -235,14 +261,15 @@ useEffect(() => {
                 )}
                 {editMode && appointment._id === editData._id && (
                   <>
-                  <p>appointment no.</p>
+                  <p>Appointment no:</p>
                     <input
                       type="number"
                       value={editData.appno}
                       onChange={(e) => setEditData({ ...editData, appno: e.target.value })}
                     />
                     <br/>
-                    <p>appointment date & time</p>
+                    <p>Preferred time: {appointment.day}</p>
+                    <p>Appointment date & time:</p>
                     <input
                       type="date"
                       value={editData.date}
@@ -254,14 +281,22 @@ useEffect(() => {
                       onChange={(e) => setEditData({ ...editData, time: e.target.value })}
                     />
                     <br/>
-                    <p>message</p>
+                    <p>Message:</p>
                      <textarea
                       type="textarea"
                       value={editData.msg}
                       onChange={(e) => setEditData({ ...editData, msg: e.target.value })}
                     />
                     <br/>
-                    <Button onClick={handleSaveEdit} style={{ color: '#77d5cb' }}>Save</Button>
+                    <Button
+                  onClick={() => {
+                    handleSaveEdit();
+                    handleAppointmentStatusChange(appointment._id, 'Confirmed');
+                  }}
+                  style={{ color: '#77d5cb' }}
+                >
+                  confirm
+                </Button>
                     <Button onClick={() => setEditMode(false)} style={{ color: '#77d5cb' }}>Cancel</Button>
                   </>
                 )}
@@ -272,6 +307,7 @@ useEffect(() => {
           ))}
         </Typography>
       </Box>
+      </ThemeProvider>
     </Box>
   );
 };

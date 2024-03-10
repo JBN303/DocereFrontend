@@ -13,15 +13,22 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import LogoutIcon from '@mui/icons-material/Logout'; // Import LogoutIcon from Material-UI
+import Grid from '@mui/material/Grid';
+import PreviewIcon from '@mui/icons-material/Preview';
+import LogoutIcon from '@mui/icons-material/Logout'; 
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import HealingIcon from '@mui/icons-material/Healing';
 import Loading from '../Doctor/Loading';
+import AdminDash from './AdminDash';
+import DoctorList from './DoctorList';
+import PatientView from './PatientView';
+import { Dashboard } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [selectedMenuItem, setSelectedMenuItem] = useState('Dashboard');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -45,67 +52,106 @@ export default function AdminDashboard() {
     // Redirect to login page
     navigate('/admin', { replace: true });
   };
+  const handleListItemClick = (text) => {
+    setSelectedMenuItem(text);
+  };
   if (isLoading) {
     return <Loading />;
   }
 
   return (
-    <Box>
-      <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#77d5cb' }}>
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Admin Dashboard
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <div>
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-          }}
-        >
-          <Toolbar />
-          <Box sx={{ overflow: 'auto' }}>
-            <List>
-              {[
-                { text: 'Dashboard', icon: <InboxIcon /> },
-                { text: 'Doctors List', icon: <MailIcon />, link: '/doctorview' },
-                { text: 'Users List', icon: <InboxIcon />, link: '/pview' },
-                // Add other menu items
-              ].map(({ text, icon, link }, index) => (
-                <ListItem key={text} disablePadding button onClick={() => navigateTo(link)}>
-                  <ListItemButton>
-                    <ListItemIcon>{icon}</ListItemIcon>
-                    <ListItemText primary={text} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-            <Divider />
+    <Box sx={{ display: 'flex' }}>
+    <CssBaseline />
+    <AppBar position="fixed" sx={{ backgroundColor: '#77d5cb', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div">
+          Admin Dashboard
+        </Typography>
+      </Toolbar>
+    </AppBar>
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+      }}
+    >
+      <Toolbar />
+      <Box sx={{ overflow: 'auto' }}>
 
-            {/* Logout button */}
-            <List>
-              <ListItem button onClick={handleLogout}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <LogoutIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Logout" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Box>
-        </Drawer>
-      </div>
-      <div sx={{ flexGrow: 7, p: 3  }}>
-        <Box component="main" sx={{ flexGrow: 7, p: 3 }}>
-          {/* The content of the selected view will be rendered here */}
-        </Box>
-      </div>
+        <List>
+          {['Dashboard', 'Doctors List','Patients List'].map((text, index) => (
+            <ListItem
+              key={text}
+              disablePadding
+              onClick={() => handleListItemClick(text)}
+              selected={selectedMenuItem === text}
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  {index % 3 === 0 ? <Dashboard /> : <PreviewIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        {/* <List>
+          {[ 'Specialities', 'Common Symptoms'].map((text, index) => (
+            <ListItem key={text} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List> */}
+                  <List>
+    {/* Logout button */}
+    <ListItem button onClick={handleLogout}>
+      <ListItemButton>
+        <ListItemIcon>
+          <LogoutIcon />
+        </ListItemIcon>
+        <ListItemText primary="Logout" />
+      </ListItemButton>
+    </ListItem>
+  </List>
+      </Box>
+    </Drawer>
+    <Box sx={{ flexGrow: 1, p: 3, background: 'white', minHeight: 1000 }}>
+      <Toolbar />
+      {/* Render content based on the selected menu item */}
+      {selectedMenuItem === 'Dashboard' && (
+        <Grid container spacing={1}>
+        <Grid item xs={12} md={12}>
+          <AdminDash/>
+        </Grid>
+      </Grid>
+        
+      )}
+      {/* Add similar conditionals for other menu items if needed */}
+      {selectedMenuItem === 'Doctors List' && (
+        <Grid container spacing={3}>
+        <Grid item xs={12} md={12}>
+          <DoctorList/>
+        </Grid>
+      </Grid>
+      )}
+
+      {selectedMenuItem === 'Patients List' && (
+        <Grid container spacing={3}>
+        <Grid item xs={12} md={12}>
+          <PatientView/>
+        </Grid>
+      </Grid>
+        
+      )}
     </Box>
+  </Box>
   );
 }

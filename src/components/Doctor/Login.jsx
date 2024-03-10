@@ -16,7 +16,7 @@ const CustomContainer = styled(Container)({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  marginTop: '100px',
+  marginTop: '300px',
   backgroundColor: '#fff',
   padding: '2rem',
   borderRadius: '8px',
@@ -59,9 +59,15 @@ const Login = () => {
       } // Assuming the route is '/doctor/:userId'
     } catch (err) {
       console.error('Error during login:', err); 
+      if (err.response && err.response.status === 401) {
+        setError('Incorrect email or password. Please try again.');
+      } else {
+        setError('An error occurred during login. Please try again later.');
+      }
       // Handle the error, display a message, or redirect to an error page
     }
   };
+  
  
 
   return (
